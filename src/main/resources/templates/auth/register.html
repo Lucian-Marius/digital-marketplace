@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Digital Marketplace</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>Digital Marketplace</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li th:if="${session.userId == null}"><a href="/login">Login</a></li>
+                <li th:if="${session.userId == null}"><a href="/register">Register</a></li>
+                <li th:if="${session.userId != null}">
+                    <span th:text="'Welcome, ' + ${session.username}">Welcome</span>
+                </li>
+                <li th:if="${session.userId != null}"><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <style>
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            padding: 2rem 0;
+        }
+        .auth-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px;
+        }
+        .auth-form h2 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+        .auth-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .auth-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #343a40;
+        }
+        .auth-form input[type="text"],
+        .auth-form input[type="email"],
+        .auth-form input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .auth-form input[type="text"]:focus,
+        .auth-form input[type="email"]:focus,
+        .auth-form input[type="password"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+        .auth-form button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .auth-form button:hover {
+            background-color: #0056b3;
+        }
+        .auth-form .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+        }
+        .auth-form .form-footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .auth-form .form-footer a:hover {
+            text-decoration: underline;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-row .form-group {
+            margin-bottom: 0;
+        }
+        .password-requirements {
+            background-color: #f0f0f0;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .password-requirements ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+        .password-requirements li {
+            margin-bottom: 0.3rem;
+        }
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .terms-checkbox input[type="checkbox"] {
+            margin-top: 0.25rem;
+        }
+        .terms-checkbox label {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        .terms-checkbox a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .terms-checkbox a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-form">
+            <h2>Create Account</h2>
+            
+            <!-- Error Message -->
+            <div th:if="${error}" class="alert alert-danger">
+                <strong>Error:</strong> <span th:text="${error}">Registration failed</span>
+            </div>
+            
+            <form method="post" action="/register">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required placeholder="John">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required placeholder="Doe">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Choose a username">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Create a strong password">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm your password">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="radio" name="accountType" value="buyer" checked> I'm a Buyer
+                    </label>
+                    <label style="margin-top: 0.5rem;">
+                        <input type="radio" name="accountType" value="seller"> I'm a Seller
+                    </label>
+                </div>
+
+                <div class="form-group terms-checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button type="submit">Create Account</button>
+
+                <div class="form-footer">
+                    <p>Already have an account? <a href="/login">Login here</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Password confirmation validation
+        const registerForm = document.querySelector('.auth-form form');
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(e) {
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Passwords do not match');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    e.preventDefault();
+                    alert('Password must be at least 6 characters long');
+                    return;
+                }
+            });
+        }
+    </script>
+</body>
+</html>

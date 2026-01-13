@@ -1,0 +1,1 @@
+-- Drop tables from Digital Marketplace database

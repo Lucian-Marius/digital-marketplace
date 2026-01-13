@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Marketplace - Home</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>Digital Marketplace</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li th:if="${session.userId == null}"><a href="/login">Login</a></li>
+                <li th:if="${session.userId == null}"><a href="/register">Register</a></li>
+                <li th:if="${session.userId != null}">
+                    <span th:text="'Welcome, ' + ${session.username}">Welcome</span>
+                </li>
+                <li th:if="${session.userId != null}"><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Welcome to Digital Marketplace</h2>
+            <p>Discover and buy premium digital products</p>
+            <button class="btn btn-primary">Start Shopping</button>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+        <div class="container">
+            <h3>Shop by Category</h3>
+            <div class="category-grid">
+                <div th:each="category : ${categories}" class="category-card">
+                    <h4 th:text="${category.name}">Category</h4>
+                    <p th:text="${category.description}">Description</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products">
+        <div class="container">
+            <h3>Featured Products</h3>
+            <div class="product-grid">
+                <div th:each="product : ${approvedProducts}" class="product-card">
+                    <img th:src="${product.previewImageUrl}" alt="Product Image" class="product-image">
+                    <h4 th:text="${product.name}">Product Name</h4>
+                    <p th:text="${product.description}">Product Description</p>
+                    <p class="price" th:text="'$' + ${product.price}">$0.00</p>
+                    <button class="btn btn-secondary">View Details</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Digital Marketplace. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Product - Digital Marketplace</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .upload-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .upload-container h2 {
+            color: #007bff;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group select,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .form-group input[type="file"] {
+            padding: 0.5rem;
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 0.75rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-submit:hover {
+            background: #0056b3;
+        }
+        .alert {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .file-requirements {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>Digital Marketplace</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/seller/dashboard">My Products</a></li>
+                <li th:if="${session.userId != null}">
+                    <span th:text="'Welcome, ' + ${session.username}">Welcome</span>
+                </li>
+                <li th:if="${session.userId != null}"><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="/seller/dashboard" class="back-link">← Back to Dashboard</a>
+
+        <div class="upload-container">
+            <h2>Upload New Product</h2>
+
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+            <form method="POST" enctype="multipart/form-data">
+                <!-- Product Name -->
+                <div class="form-group">
+                    <label for="name">Product Name (Optional - uses placeholder if empty)</label>
+                    <input type="text" id="name" name="name" placeholder="My Awesome Product">
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label for="description">Description (Optional - uses placeholder if empty)</label>
+                    <textarea id="description" name="description" placeholder="Describe your digital product..."></textarea>
+                </div>
+
+                <!-- Category -->
+                <div class="form-group">
+                    <label for="categoryId">Category *</label>
+                    <select id="categoryId" name="categoryId" required>
+                        <option value="">Select Category</option>
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                    </select>
+                </div>
+
+                <!-- Price -->
+                <div class="form-group">
+                    <label for="price">Price ($)</label>
+                    <input type="number" id="price" name="price" value="0" min="0" step="0.01">
+                </div>
+
+                <!-- Product File -->
+                <div class="form-group">
+                    <label for="file">Product File *</label>
+                    <input type="file" id="file" name="file" required>
+                    <div class="file-requirements">
+                        Accepted formats: .blend, .fbx, .obj, .zip, .pdf, .psd, etc.
+                    </div>
+                </div>
+
+                <!-- Preview Image -->
+                <div class="form-group">
+                    <label for="previewImage">Product Preview Image (Optional - uses placeholder if empty)</label>
+                    <input type="file" id="previewImage" name="previewImage" accept="image/*">
+                    <div class="file-requirements">
+                        Accepted formats: JPG, PNG (max 5MB)
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-submit">Upload Product</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

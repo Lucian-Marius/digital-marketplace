@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Digital Marketplace</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1>Digital Marketplace</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li th:if="${session.userId == null}"><a href="/login">Login</a></li>
+                <li th:if="${session.userId == null}"><a href="/register">Register</a></li>
+                <li th:if="${session.userId != null}">
+                    <span th:text="'Welcome, ' + ${session.username}">Welcome</span>
+                </li>
+                <li th:if="${session.userId != null}"><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="container">
+            <h2>About Digital Marketplace</h2>
+            
+            <div class="about-content">
+                <h3>Our Mission</h3>
+                <p>
+                    We are dedicated to connecting creators and buyers in the digital marketplace. 
+                    Our platform provides a secure, reliable space for trading digital products.
+                </p>
+
+                <h3>Why Choose Us?</h3>
+                <ul>
+                    <li>Secure transactions with buyer protection</li>
+                    <li>Fast and reliable delivery of digital products</li>
+                    <li>Support for multiple file types and categories</li>
+                    <li>Fair pricing and transparent commission structure</li>
+                    <li>Dedicated customer support</li>
+                </ul>
+
+                <h3>Our Values</h3>
+                <p>
+                    Integrity, transparency, and user satisfaction are at the core of everything we do.
+                    We strive to create a thriving community where creators can showcase their talents
+                    and buyers can find quality digital products.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Digital Marketplace. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
