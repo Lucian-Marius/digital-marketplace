@@ -14,35 +14,34 @@ public class UploadChunk {
     private Long id;
 
     @Column(nullable = false)
-    private String uploadId; // Unique identifier for the entire upload
+    private String uploadId;
 
     @Column(nullable = false)
-    private int chunkNumber; // Chunk sequence number
+    private int chunkNumber;
 
     @Column(nullable = false)
-    private int totalChunks; // Total number of chunks expected
+    private int totalChunks;
 
     @Column(nullable = false)
-    private String fileName; // Original file name
+    private String fileName;
 
     @Column(nullable = false)
-    private String contentType; // File content type
+    private String contentType;
 
     @Column(nullable = false)
-    private long totalFileSize; // Total file size
+    private long totalFileSize;
 
     @Column(nullable = false)
-    private long chunkSize; // Size of this chunk
+    private long chunkSize;
 
-    @Lob
     @Column(nullable = false)
-    private byte[] data; // Chunk data
+    private String chunkPath; // path to the temp chunk file on disk
 
     @Column(nullable = false)
     private LocalDateTime uploadedAt;
 
     @Column(nullable = false)
-    private boolean completed = false; // Whether this chunk has been processed
+    private boolean completed = false;
 
     @PrePersist
     protected void onCreate() {
