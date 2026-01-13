@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Product - Digital Marketplace</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script src="/js/chunked-upload.js"></script>
     <style>
         .upload-container {
             max-width: 600px;
@@ -62,6 +63,10 @@
         .btn-submit:hover {
             background: #0056b3;
         }
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
         .alert {
             padding: 1rem;
             border-radius: 4px;
@@ -77,6 +82,11 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
         .file-requirements {
             font-size: 0.9rem;
             color: #666;
@@ -91,6 +101,39 @@
         }
         .back-link:hover {
             text-decoration: underline;
+        }
+        .progress-container {
+            margin-top: 1rem;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #007bff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .upload-mode {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        .upload-mode strong {
+            color: #007bff;
         }
     </style>
 </head>
@@ -167,10 +210,145 @@
                     </div>
                 </div>
 
+                <!-- Upload Mode Indicator -->
+                <div class="upload-mode" id="uploadMode" style="display: none;">
+                    <strong>Large file detected!</strong> Using chunked upload for better performance.
+                </div>
+
+                <!-- Progress Container -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">Preparing upload...</div>
+                </div>
+
                 <!-- Submit Button -->
-                <button type="submit" class="btn-submit">Upload Product</button>
+                <button type="submit" class="btn-submit" id="submitBtn">Upload Product</button>
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const fileInput = document.getElementById('file');
+            const submitBtn = document.getElementById('submitBtn');
+            const uploadMode = document.getElementById('uploadMode');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            let chunkedUploader = null;
+            let isUploading = false;
+
+            // Check file size on selection
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const fileSizeMB = file.size / (1024 * 1024);
+                    if (fileSizeMB > 50) { // Use chunked upload for files > 50MB
+                        uploadMode.style.display = 'block';
+                        chunkedUploader = new ChunkedUploader({
+                            chunkSize: 1024 * 1024, // 1MB chunks
+                            onProgress: updateProgress,
+                            onComplete: onUploadComplete,
+                            onError: onUploadError
+                        });
+                    } else {
+                        uploadMode.style.display = 'none';
+                        chunkedUploader = null;
+                    }
+                }
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', async function(e) {
+                if (isUploading) return;
+
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const fileSizeMB = file.size / (1024 * 1024);
+
+                if (fileSizeMB > 50 && chunkedUploader) {
+                    // Use chunked upload
+                    e.preventDefault();
+                    await performChunkedUpload(file);
+                }
+                // For smaller files, let the form submit normally
+            });
+
+            async function performChunkedUpload(file) {
+                isUploading = true;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Uploading...';
+                progressContainer.style.display = 'block';
+                progressText.textContent = 'Initializing upload...';
+
+                try {
+                    // Upload file using chunked uploader
+                    const result = await chunkedUploader.uploadFile(file, 'products');
+
+                    // Now submit the form with the uploaded file URL
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'fileUrl';
+                    hiddenInput.value = result.fileUrl;
+                    form.appendChild(hiddenInput);
+
+                    // Clear the file input since we're using the uploaded URL
+                    fileInput.value = '';
+
+                    // Submit the form
+                    form.submit();
+
+                } catch (error) {
+                    console.error('Upload failed:', error);
+                    showAlert('Upload failed: ' + error.message, 'error');
+                    resetUploadState();
+                }
+            }
+
+            function updateProgress(progress, currentChunk, totalChunks) {
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `Uploading chunk ${currentChunk} of ${totalChunks} (${progress}%)`;
+            }
+
+            function onUploadComplete(result) {
+                progressText.textContent = 'Upload complete! Processing...';
+                progressFill.style.width = '100%';
+            }
+
+            function onUploadError(error) {
+                console.error('Upload error:', error);
+                showAlert('Upload failed: ' + error.message, 'error');
+                resetUploadState();
+            }
+
+            function resetUploadState() {
+                isUploading = false;
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Upload Product';
+                progressContainer.style.display = 'none';
+                progressFill.style.width = '0%';
+            }
+
+            function showAlert(message, type) {
+                // Remove existing alerts
+                const existingAlerts = document.querySelectorAll('.alert');
+                existingAlerts.forEach(alert => alert.remove());
+
+                // Create new alert
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type}`;
+                alertDiv.textContent = message;
+
+                // Insert at the top of the upload container
+                const container = document.querySelector('.upload-container');
+                container.insertBefore(alertDiv, container.firstChild.nextSibling);
+            }
+        });
+    </script>
 </body>
 </html>
